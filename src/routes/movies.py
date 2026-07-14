@@ -20,6 +20,10 @@ async def get_movies(
     per_page: Annotated[int, Query(ge=1, le=20)] = 10,
 ):
     total_items = await db.scalar(select(func.count()).select_from(MovieModel))
+
+    if total_items == 0:
+        raise HTTPException(status_code=404, detail="No movies found.")
+
     total_pages = ceil(total_items / per_page)
 
     result = await db.execute(
